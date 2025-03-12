@@ -1,46 +1,125 @@
 import React from "react";
-import { Facebook, Twitter, Instagram, Linkedin } from "lucide-react"; // Lucide React Icons
+import { motion } from "framer-motion";
+import { NavLink } from "react-router-dom";
 
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white py-8 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
 
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Chatbot", path: "/chatbot" },
+    { name: "Games", path: "/games" }
+  ];
+
+  return (
+    <motion.footer 
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+      variants={containerVariants}
+      className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white py-16 px-8 relative overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10"></div>
+      
+      <motion.div 
+        className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left relative z-10 gap-12"
+        variants={containerVariants}
+      >
         {/* Left Section - Brand Info */}
-        <div className="mb-6 md:mb-0">
-          <h2 className="text-2xl font-bold">Healthify</h2>
-          <p className="text-sm opacity-80 mt-1">Your AI-powered <br /> wellness companion 💙</p>
-        </div>
+        <motion.div 
+          className="mb-8 md:mb-0"
+          variants={itemVariants}
+        >
+          <motion.h2 
+            className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight leading-relaxed py-1"
+            whileHover={{ scale: 1.05 }}
+          >
+            Healthify
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-white/90 mt-2 font-medium tracking-wide"
+            variants={itemVariants}
+          >
+            Your AI-powered wellness companion 
+            <motion.span
+              initial={{ scale: 1 }}
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="inline-block ml-2"
+            >
+              💙
+            </motion.span>
+          </motion.p>
+        </motion.div>
 
         {/* Center Section - Navigation Links */}
-        <div className="flex flex-wrap justify-center md:justify-start space-x-6 text-sm">
-          <a href="/" className="hover:text-blue-400 transition">Home</a>
-          <a href="/chatbot" className="hover:text-blue-400 transition">Chatbot</a>
-          <a href="/games" className="hover:text-blue-400 transition">Games</a>
-        </div>
-
-        {/* Right Section - Social Media Links */}
-        <div className="flex space-x-4 mt-6 md:mt-0">
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-            <Facebook size={22} className="hover:text-blue-500 transition" />
-          </a>
-          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-            <Twitter size={22} className="hover:text-blue-400 transition" />
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-            <Instagram size={22} className="hover:text-pink-500 transition" />
-          </a>
-          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-            <Linkedin size={22} className="hover:text-blue-600 transition" />
-          </a>
-        </div>
-      </div>
+        <motion.div 
+          className="flex flex-wrap justify-center gap-12 text-lg"
+          variants={itemVariants}
+        >
+          {navLinks.map((link, index) => (
+            <motion.div
+              key={link.name}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative group"
+            >
+              <NavLink
+                to={link.path}
+                className={({ isActive }) =>
+                  `relative px-4 py-2 font-medium transition-all duration-300 ${
+                    isActive 
+                      ? "text-blue-300" 
+                      : "text-white hover:text-blue-200"
+                  }`
+                }
+              >
+                {link.name}
+                <motion.div
+                  className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transform origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </NavLink>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
 
       {/* Bottom Section */}
-      <div className="text-center text-xs opacity-70 mt-6">
-        © {new Date().getFullYear()} Healthify. All Rights Reserved.
-      </div>
-    </footer>
+      <motion.div 
+        className="text-center text-sm text-white/60 mt-8 pt-8 border-t border-white/10"
+        variants={itemVariants}
+      >
+        <motion.p
+          whileHover={{ color: "#fff" }}
+          transition={{ duration: 0.3 }}
+        >
+          © {new Date().getFullYear()} Healthify. All Rights Reserved.
+        </motion.p>
+      </motion.div>
+    </motion.footer>
   );
 };
 
