@@ -8,6 +8,7 @@ module.exports = {
         slideInRight: "slideInRight 0.5s ease-out forwards",
         slideInLeft: "slideInLeft 0.5s ease-out forwards",
         blob: "blob 7s infinite",
+        'spin-slow': 'spin 3s linear infinite',
       },
       keyframes: {
         fadeIn: {

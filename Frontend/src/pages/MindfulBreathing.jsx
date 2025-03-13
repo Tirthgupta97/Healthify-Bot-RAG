@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Play, Pause, ArrowLeft } from "lucide-react";
+import { Play, Pause, ArrowLeft, Moon, Sun, Wind } from "lucide-react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const affirmations = [
@@ -7,6 +8,8 @@ const affirmations = [
     "You are in control of your breath.",
     "Inhale positivity, exhale negativity.",
     "You are strong, resilient, and enough.",
+    "Each breath brings peace and clarity.",
+    "Let go of tension with each exhale.",
 ];
 
 const MindfulBreathing = () => {
@@ -50,52 +53,94 @@ const MindfulBreathing = () => {
     }, [isPlaying]);
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen w-screen bg-gradient-to-br from-blue-900 to-blue-600 text-white relative">
-            {/* Back Button */}
-            <button
-                onClick={() => navigate(-1)}
-                className="absolute top-5 left-5 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-300 cursor-pointer"
-            >
-                <ArrowLeft size={20} /> Back
-            </button>
-
-            {/* Title */}
-            <h1 className="text-4xl font-bold tracking-wide mb-2">Mindful Breathing</h1>
-            <p className="text-lg text-gray-300 mb-6">A guided breathing experience for relaxation.</p>
-
-            {/* Breathing Circle */}
-            <div className="relative flex items-center justify-center w-64 h-64">
-                {/* Animated Outer Breathing Circle */}
-                <div
-                    className={`absolute w-44 h-44 rounded-full border-8 border-white transition-all duration-[4s] ease-in-out ${
-                        !isPlaying
-                            ? "scale-100 opacity-100"
-                            : breathingPhase === "Inhale"
-                            ? "scale-150 opacity-80"
-                            : breathingPhase === "Hold"
-                            ? "scale-150 opacity-80"
-                            : breathingPhase === "Exhale"
-                            ? "scale-100 opacity-100"
-                            : ""
-                    }`}
-                ></div>
-
-                {/* Inner Circle */}
-                <div className="relative w-40 h-40 rounded-full bg-green-500 bg-opacity-20 flex items-center justify-center">
-                    <div className="text-2xl font-semibold">{breathingPhase}</div>
-                </div>
+        <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 text-white relative overflow-hidden">
+            {/* Background Animation */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -left-10 -top-10 w-72 h-72 bg-purple-500/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+                <div className="absolute -right-10 -top-10 w-72 h-72 bg-yellow-500/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob delay-2000"></div>
+                <div className="absolute -bottom-10 left-20 w-72 h-72 bg-pink-500/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob delay-4000"></div>
             </div>
 
-            {/* Affirmation */}
-            <p className="text-xl mt-6 text-center italic text-gray-300">{affirmation}</p>
-
-            {/* Start/Pause Button */}
-            <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="mt-8 bg-green-500 hover:bg-green-600 px-6 py-3 rounded-lg flex items-center gap-2 text-lg font-medium shadow-lg transition-all duration-300"
+            {/* Back Button */}
+            <motion.button
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                onClick={() => navigate(-1)}
+                className="absolute top-4 left-4 z-50 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl 
+                          flex items-center gap-2 transition-all duration-300 backdrop-blur-sm border border-white/10"
             >
-                {isPlaying ? <Pause size={24} /> : <Play size={24} />} {isPlaying ? "Pause" : "Start"}
-            </button>
+                <ArrowLeft size={20} /> Back
+            </motion.button>
+
+            {/* Main Content */}
+            <div className="relative flex flex-col items-center justify-center z-10 w-full max-w-3xl mx-auto px-4 py-8">
+                {/* Title Section */}
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center mb-6"
+                >
+                    <h1 className="text-4xl sm:text-5xl font-bold tracking-wide mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                        Mindful Breathing
+                    </h1>
+                    <p className="text-base sm:text-lg text-gray-300">A guided breathing experience for inner peace</p>
+                </motion.div>
+
+                {/* Breathing Circle */}
+                <div className="relative flex items-center justify-center w-64 h-64 sm:w-72 sm:h-72 mb-6">
+                    {/* Animated Circles */}
+                    <motion.div
+                        animate={{
+                            scale: breathingPhase === "Inhale" || breathingPhase === "Hold" ? 1.3 : 0.9,
+                            opacity: breathingPhase === "Relax" ? 0.3 : 0.6,
+                        }}
+                        transition={{ duration: 4, ease: "easeInOut" }}
+                        className="absolute w-40 h-40 sm:w-48 sm:h-48 rounded-full border-8 border-purple-400/30"
+                    />
+
+                    {/* Inner Circle */}
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 
+                                 backdrop-blur-md flex items-center justify-center border border-white/20"
+                    >
+                        <div className="flex flex-col items-center gap-2">
+                            {breathingPhase === "Inhale" && <Wind className="text-blue-400" size={24} />}
+                            {breathingPhase === "Hold" && <Sun className="text-yellow-400" size={24} />}
+                            {breathingPhase === "Exhale" && <Moon className="text-purple-400" size={24} />}
+                            <div className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
+                                {breathingPhase}
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Affirmation */}
+                <motion.p
+                    key={affirmation}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-lg sm:text-xl text-center italic text-gray-300 mb-6 px-4 min-h-[3rem]"
+                >
+                    {affirmation}
+                </motion.p>
+
+                {/* Controls */}
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className={`px-6 sm:px-8 py-3 sm:py-4 rounded-xl flex items-center gap-3 text-base sm:text-lg font-medium shadow-lg transition-all 
+                              duration-300 border backdrop-blur-sm ${
+                                isPlaying
+                                    ? "bg-rose-500/20 hover:bg-rose-500/30 border-rose-500/30"
+                                    : "bg-green-500/20 hover:bg-green-500/30 border-green-500/30"
+                              }`}
+                >
+                    {isPlaying ? <Pause size={24} /> : <Play size={24} />}
+                    {isPlaying ? "Pause" : "Start"}
+                </motion.button>
+            </div>
         </div>
     );
 };

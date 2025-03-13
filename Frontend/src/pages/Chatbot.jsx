@@ -212,7 +212,7 @@ const Chatbot = () => {
   };
 
   return (  
-    <div className="relative w-full h-screen flex items-center justify-center bg-gradient-to-br from-blue-200 via-purple-100 to-white px-4 sm:px-8 overflow-hidden">
+    <div className="relative w-full h-screen flex items-center justify-center bg-gradient-to-br from-blue-200 via-purple-100 to-white px-4 sm:px-8 overflow-hidden mt-16">
       {/* Background Animation Circles */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -left-10 -top-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>

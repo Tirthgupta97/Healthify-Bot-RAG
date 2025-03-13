@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
+import { Heart } from "lucide-react";
 
 const Footer = () => {
   const containerVariants = {
@@ -32,48 +33,48 @@ const Footer = () => {
   ];
 
   return (
-    <motion.footer 
+    <motion.footer
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
       variants={containerVariants}
-      className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white py-16 px-8 relative overflow-hidden"
+      className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white py-8 px-8 relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10"></div>
-      
-      <motion.div 
+
+      <motion.div
         className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left relative z-10 gap-12"
         variants={containerVariants}
       >
         {/* Left Section - Brand Info */}
-        <motion.div 
+        <motion.div
           className="mb-8 md:mb-0"
           variants={itemVariants}
         >
-          <motion.h2 
+          <motion.h2
             className="text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight leading-relaxed py-1"
             whileHover={{ scale: 1.05 }}
           >
             Healthify
           </motion.h2>
-          <motion.p 
-            className="text-xl text-white/90 mt-2 font-medium tracking-wide"
+          <motion.p
+            className="text-xl text-white/90 mt-2 font-medium tracking-wide flex justify-center items-center"
             variants={itemVariants}
           >
-            Your AI-powered wellness companion 
+            Your AI-powered wellness companion
             <motion.span
               initial={{ scale: 1 }}
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
               className="inline-block ml-2"
             >
-              💙
+              <Heart className=" fill-blue-700"/>
             </motion.span>
           </motion.p>
         </motion.div>
 
         {/* Center Section - Navigation Links */}
-        <motion.div 
+        <motion.div
           className="flex flex-wrap justify-center gap-12 text-lg"
           variants={itemVariants}
         >
@@ -87,10 +88,9 @@ const Footer = () => {
               <NavLink
                 to={link.path}
                 className={({ isActive }) =>
-                  `relative px-4 py-2 font-medium transition-all duration-300 ${
-                    isActive 
-                      ? "text-blue-300" 
-                      : "text-white hover:text-blue-200"
+                  `relative px-4 py-2 font-medium transition-all duration-300 ${isActive
+                    ? "text-blue-300"
+                    : "text-white hover:text-blue-200"
                   }`
                 }
               >
@@ -108,7 +108,7 @@ const Footer = () => {
       </motion.div>
 
       {/* Bottom Section */}
-      <motion.div 
+      <motion.div
         className="text-center text-sm text-white/60 mt-8 pt-8 border-t border-white/10"
         variants={itemVariants}
       >
