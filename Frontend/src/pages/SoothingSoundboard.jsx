@@ -5,30 +5,43 @@ import { motion } from "framer-motion";
 
 // List of relaxing sounds
 const sounds = [
-    { id: 1, name: "Rain", src: "/sounds/rain.mp3", emoji: "🌧️" },
-    { id: 2, name: "Ocean", src: "/sounds/ocean.mp3", emoji: "🌊" },
-    { id: 3, name: "Forest", src: "/sounds/forest.mp3", emoji: "🌲" },
-    { id: 4, name: "Fireplace", src: "/sounds/fireplace.mp3", emoji: "🔥" },
-    { id: 5, name: "Wind Chimes", src: "/sounds/windchimes.mp3", emoji: "🎐" },
+    { id: 1, name: "Rain", src: "/sounds/rain.mp3", emoji: "🌧️", gif: "/gifs/rain.gif" },
+    { id: 2, name: "Ocean", src: "/sounds/ocean.mp3", emoji: "🌊", gif: "/gifs/ocean.gif" },
+    { id: 3, name: "Forest", src: "/sounds/forest.mp3", emoji: "🌲", gif: "/gifs/forest.gif" },
+    { id: 4, name: "Fireplace", src: "/sounds/fireplace.mp3", emoji: "🔥", gif: "/gifs/fireplace.gif" },
+    { id: 5, name: "Wind Chimes", src: "/sounds/windchimes.mp3", emoji: "🎐", gif: "/gifs/windchimes.gif" },
 ];
 
 const SoothingSoundboard = () => {
     const [playing, setPlaying] = useState({});
     const [volume, setVolume] = useState(0.5);
+    const [currentGif, setCurrentGif] = useState(null);
     const navigate = useNavigate();
 
     // Handle Play/Pause Toggle
-    const togglePlay = (id, src) => {
+    const togglePlay = (id, src, gif) => {
+        // If the clicked sound is already playing, pause it
         if (playing[id]) {
             playing[id].pause();
             setPlaying((prev) => ({ ...prev, [id]: null }));
-        } else {
-            const audio = new Audio(src);
-            audio.loop = true;
-            audio.volume = volume;
-            audio.play();
-            setPlaying((prev) => ({ ...prev, [id]: audio }));
+            setCurrentGif(null);
+            return;
         }
+
+        // Stop any currently playing sounds
+        Object.values(playing).forEach((audio) => {
+            if (audio) audio.pause();
+        });
+
+        // Play the new sound
+        const audio = new Audio(src);
+        audio.loop = true;
+        audio.volume = volume;
+        audio.play();
+        
+        // Update state
+        setPlaying({ [id]: audio });
+        setCurrentGif(gif);
     };
 
     // Handle Volume Change
@@ -46,6 +59,7 @@ const SoothingSoundboard = () => {
             if (audio) audio.pause();
         });
         setPlaying({});
+        setCurrentGif(null);
     };
 
     return (
@@ -76,40 +90,59 @@ const SoothingSoundboard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-center mb-6"
                 >
-                    <h1 className="text-3xl sm:text-4xl font-bold tracking-wide mb-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-green-400 text-transparent bg-clip-text">
+                    <h1 className="text-3xl sm:text-4xl font-bold tracking-wide mb-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-green-400 text-transparent bg-clip-text py-1">
                         Soothing Soundboard
                     </h1>
                     <p className="text-base sm:text-lg text-gray-300">Relax with nature's sounds 🌿🎶</p>
                 </motion.div>
 
-                {/* Sound Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
-                    {sounds.map((sound) => (
-                        <motion.div
-                            key={sound.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`relative group flex flex-col items-center justify-center p-4 sm:p-6 rounded-xl backdrop-blur-sm 
-                                     border transition-all duration-300 cursor-pointer shadow-lg
-                                     ${playing[sound.id]
-                                         ? "bg-emerald-500/20 border-emerald-400/30 shadow-emerald-500/20"
-                                         : "bg-white/5 border-white/10 hover:bg-white/10"}`}
-                            onClick={() => togglePlay(sound.id, sound.src)}
-                        >
-                            <span className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform duration-300">
-                                {sound.emoji}
-                            </span>
-                            <p className="text-sm sm:text-base font-medium text-gray-200">{sound.name}</p>
+                {/* Content Container */}
+                <div className="flex w-full gap-6">
+                    {/* Sound Grid */}
+                    <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
+                        {sounds.map((sound) => (
                             <motion.div
-                                animate={{ scale: playing[sound.id] ? 1.2 : 1 }}
-                                className="absolute bottom-1 opacity-60 group-hover:opacity-100 transition-opacity"
+                                key={sound.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className={`relative group flex flex-col items-center justify-center p-4 sm:p-6 rounded-xl backdrop-blur-sm 
+                                         border transition-all duration-300 cursor-pointer shadow-lg
+                                         ${playing[sound.id]
+                                             ? "bg-emerald-500/20 border-emerald-400/30 shadow-emerald-500/20"
+                                             : "bg-white/5 border-white/10 hover:bg-white/10"}`}
+                                onClick={() => togglePlay(sound.id, sound.src, sound.gif)}
                             >
-                                {playing[sound.id] ? <Pause size={16} /> : <Play size={16} />}
+                                <span className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform duration-300">
+                                    {sound.emoji}
+                                </span>
+                                <p className="text-sm sm:text-base font-medium text-gray-200">{sound.name}</p>
+                                <motion.div
+                                    animate={{ scale: playing[sound.id] ? 1.2 : 1 }}
+                                    className="absolute bottom-1 opacity-60 group-hover:opacity-100 transition-opacity"
+                                >
+                                    {playing[sound.id] ? <Pause size={16} /> : <Play size={16} />}
+                                </motion.div>
                             </motion.div>
+                        ))}
+                    </div>
+
+                    {/* Gif Display */}
+                    {currentGif && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="flex-shrink-0 w-64 h-64 sm:w-72 sm:h-72 rounded-2xl overflow-hidden border-4 border-emerald-500/30 shadow-lg"
+                        >
+                            <img 
+                                src={currentGif} 
+                                alt="Relaxing Scene" 
+                                className="w-full h-full object-cover"
+                            />
                         </motion.div>
-                    ))}
+                    )}
                 </div>
 
                 {/* Controls Section */}

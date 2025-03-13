@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const affirmations = [
-    "Breathe in calm, breathe out stress.",
-    "You are in control of your breath.",
-    "Inhale positivity, exhale negativity.",
-    "You are strong, resilient, and enough.",
-    "Each breath brings peace and clarity.",
-    "Let go of tension with each exhale.",
+    "🧘‍♀️ Breathe in calm, breathe out stress. 🌬️",
+    "🌈 You are in control of your breath. 💨",
+    "✨ Inhale positivity, exhale negativity. 🌟",
+    "💪 You are strong, resilient, and enough. 🌿",
+    "🌊 Each breath brings peace and clarity. 🕊️",
+    "🍃 Let go of tension with each exhale. 🌸",
 ];
 
 const MindfulBreathing = () => {
@@ -81,9 +81,9 @@ const MindfulBreathing = () => {
                     className="text-center mb-6"
                 >
                     <h1 className="text-4xl sm:text-5xl font-bold tracking-wide mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
-                        Mindful Breathing
+                        Mindful Breathing 🧘‍♀️
                     </h1>
-                    <p className="text-base sm:text-lg text-gray-300">A guided breathing experience for inner peace</p>
+                    <p className="text-base sm:text-lg text-gray-300">A guided breathing experience for inner peace 🌈</p>
                 </motion.div>
 
                 {/* Breathing Circle */}
@@ -105,9 +105,11 @@ const MindfulBreathing = () => {
                                  backdrop-blur-md flex items-center justify-center border border-white/20"
                     >
                         <div className="flex flex-col items-center gap-2">
-                            {breathingPhase === "Inhale" && <Wind className="text-blue-400" size={24} />}
-                            {breathingPhase === "Hold" && <Sun className="text-yellow-400" size={24} />}
-                            {breathingPhase === "Exhale" && <Moon className="text-purple-400" size={24} />}
+                            {breathingPhase === "Inhale" && <div className="text-2xl">🫁</div>}
+                            {breathingPhase === "Hold" && <div className="text-2xl">⏸️</div>}
+                            {breathingPhase === "Exhale" && <div className="text-2xl">💨</div>}
+                            {breathingPhase === "Ready" && <div className="text-2xl">🧘‍♀️</div>}
+                            {breathingPhase === "Relax" && <div className="text-2xl">😌</div>}
                             <div className="text-xl sm:text-2xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text">
                                 {breathingPhase}
                             </div>
@@ -120,7 +122,7 @@ const MindfulBreathing = () => {
                     key={affirmation}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-lg sm:text-xl text-center italic text-gray-300 mb-6 px-4 min-h-[3rem]"
+                    className="text-lg sm:text-xl text-center italic text-gray-300 mb-6 px-4 min-h-[3rem] tracking-wide"
                 >
                     {affirmation}
                 </motion.p>
@@ -138,7 +140,7 @@ const MindfulBreathing = () => {
                               }`}
                 >
                     {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-                    {isPlaying ? "Pause" : "Start"}
+                    {isPlaying ? "Pause 🛑" : "Start ▶️"}
                 </motion.button>
             </div>
         </div>
