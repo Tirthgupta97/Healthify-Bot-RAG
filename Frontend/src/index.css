@@ -4,70 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Animations */
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-@keyframes slideInRight {
-  from { transform: translateX(50px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideInLeft {
-  from { transform: translateX(-50px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes blob {
-  0% {
-    transform: translate(0px, 0px) scale(1);
-  }
-  33% {
-    transform: translate(30px, -50px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-  100% {
-    transform: translate(0px, 0px) scale(1);
-  }
-}
-
-.animate-blob {
-  animation: blob 7s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-.prose h2 {
-  @apply text-xl font-semibold text-indigo-700 mb-2 mt-4;
-}
-
-.prose br {
-  @apply content-[''] block mt-2;
-}
-
-.prose span {
-  @apply block mb-1;
-}
-
 /* Message Styling */
 .message-content {
-  @apply space-y-4 animate-fadeIn;
+  @apply space-y-4;
 }
 
 .message-section {
@@ -96,10 +35,6 @@
 
 .emoji-highlight {
   @apply inline-block animate-bounce;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-out forwards;
 }
 
 /* Message Transitions */
@@ -139,4 +74,13 @@
   .message-section .bullet-point {
     @apply flex items-start gap-2 ml-2 mb-2;
   }
+}
+
+/* Animation Delays */
+.delay-2000 {
+  animation-delay: 2000ms;
+}
+
+.delay-4000 {
+  animation-delay: 4000ms;
 }
