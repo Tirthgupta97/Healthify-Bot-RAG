@@ -87,7 +87,7 @@ const MemoryMatch = () => {
 
       {/* Title Section */}
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-bold tracking-wide mb-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+        <h1 className="text-5xl font-bold tracking-wide mb-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text mt-10 lg:mt-0">
           Memory Match
         </h1>
         <p className="text-lg text-gray-300">Test your memory by matching pairs of emojis!</p>

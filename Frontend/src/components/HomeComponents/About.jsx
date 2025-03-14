@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 const About = () => {
   const aboutFeatures = [
     { title: "Intelligent AI", desc: "Engage in meaningful conversations with an empathetic AI.", img: "https://www.jonesday.com/-/media/images/publications/2022/03/which-ai-components-are-copyright-protectable/articleimage/which_ai_components_are_copyright_protectable_soc.jpeg?rev=76293a46253745c5a4f95842bec945b8&la=en&h=800&w=1600&hash=1F73AF566F557765D950461B0485D246" },
-    { title: "Stress-Free Activities", desc: "Interactive games and exercises to help you relax.", img: "https://cdn.fourthwall.com/offer/sh_7a6bdcf5-93c5-46c1-a77f-c6541a057c49/7ec683b8-3751-414f-845c-b144a6bd371f.png" },
+    { title: "Stress-Free Activities", desc: "Interactive games and exercises to help you relax.", img: "./home-imgs/stress.png" },
     { title: "Global Support", desc: "Access mental health resources, helplines, and guidance worldwide.", img: "https://img.freepik.com/free-photo/hands-holding-earth-csr-business-campaign_53876-127168.jpg" },
     { title: "Mood Tracking", desc: "Monitor your mental well-being over time with easy tracking tools.", img: "https://thumbs.dreamstime.com/b/screenshot-mood-tracking-apps-calendar-feature-showing-months-worth-data-colorful-bars-vector-illustration-319048013.jpg" },
   ];
@@ -62,7 +62,7 @@ const About = () => {
         </motion.h2>
 
         <motion.p
-          className="text-xl max-w-3xl mx-auto mb-16 text-gray-700"
+          className="text-xl max-w-3xl mx-auto mb-16 text-gray-700 px-8 text-justify"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}

@@ -8,6 +8,7 @@ const gamesList = [
     { name: "Color & Relax", path: "/Calm-Coloring", img: "https://static.vecteezy.com/system/resources/thumbnails/023/294/542/small_2x/relax-cute-hand-drawn-coloring-pages-for-kids-and-adults-motivational-quotes-text-beautiful-drawings-for-girls-with-patterns-details-coloring-book-with-flowers-and-tropical-plants-vector.jpg" },
     { name: "Mindful Breathing", path: "/Breathing", img: "https://resize.indiatvnews.com/en/resize/newbucket/1200_-/2021/05/breathing-exercise-1620577374.jpg" },
     { name: "Memory Match", path: "/Memory-Match", img: "https://img.freepik.com/free-vector/hand-drawn-memory-game-card_23-2150138543.jpg" },
+    { name: "2048", path: "/2048", img: "https://images.crazygames.com/qube-2048-elf_16x9/20241203035143/qube-2048-elf_16x9-cover?auto=format,compress&q=75&cs=strip" },
 ];
 
 const GameItem = ({ name, path, img, index }) => (

@@ -9,10 +9,11 @@ import MindfulBreathing from "./pages/MindfulBreathing";
 import SoothingSoundboard from "./pages/SoothingSoundboard";
 import CalmColoring from "./pages/CalmColoring";
 import HangmanGame from "./pages/HangmanGame";
+import Game2048 from "./pages/Game2048";
 
 const Layout = ({ children }) => {
   const location = useLocation();
-  const hideHeaderFooter = location.pathname === "/Memory-Match" || location.pathname === "/Breathing" || location.pathname === "/Sound-board" || location.pathname === "/Calm-Coloring" || location.pathname === "/Hang-Man";
+  const hideHeaderFooter = location.pathname === "/Memory-Match" || location.pathname === "/Breathing" || location.pathname === "/Sound-board" || location.pathname === "/Calm-Coloring" || location.pathname === "/Hang-Man" || location.pathname === "/2048";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -36,6 +37,7 @@ const App = () => {
           <Route path="/Sound-board" element={<SoothingSoundboard />} />
           <Route path="/Calm-Coloring" element={<CalmColoring />} />
           <Route path="/Hang-Man" element={<HangmanGame />} />
+          <Route path="/2048" element={<Game2048 />} />
         </Routes>
       </Layout>
     </Router>
