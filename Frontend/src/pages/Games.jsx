@@ -80,7 +80,7 @@ const Games = () => {
                     Explore our collection of mindful games designed to help you relax and destress
                 </motion.p>
                 <motion.div 
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+                    className="grid grid-cols-3 gap-8 max-w-5xl mx-auto"
                     variants={{
                         hidden: { opacity: 0 },
                         show: {

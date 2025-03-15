@@ -15,8 +15,11 @@
     "lucide-react": "^0.479.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^7.2.0",
     "react-touch-events": "^3.0.0",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.0.13",
     "tailwindcss-animations": "^2.0.0"
   },

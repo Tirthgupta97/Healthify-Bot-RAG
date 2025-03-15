@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Play, Pause, Volume2, RefreshCw, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -18,6 +18,16 @@ const SoothingSoundboard = () => {
     const [volume, setVolume] = useState(0.5);
     const [activeSound, setActiveSound] = useState(null);
     const navigate = useNavigate();
+
+    // Cleanup function to stop all sounds when component unmounts
+    useEffect(() => {
+        return () => {
+            // Stop all audio when navigating away
+            Object.values(playing).forEach((audio) => {
+                if (audio) audio.pause();
+            });
+        };
+    }, [playing]);
 
     // Handle Play/Pause Toggle
     const togglePlay = (sound) => {

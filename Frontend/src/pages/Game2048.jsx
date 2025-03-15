@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, RotateCcw, Undo2, X, Trophy, Frown, Crown, ArrowUp, ArrowDown, ArrowRight, } from "lucide-react";
@@ -130,6 +130,10 @@ const Game2048 = () => {
     const [score, setScore] = useState(0);
     const [backgroundMusic] = useState(new Audio("/music/game-music.mp3"));
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+    
+    // Add refs for touch gesture handling
+    const touchStartRef = useRef({ x: 0, y: 0 });
+    const gridRef = useRef(null);
 
     // Initialize game
     useEffect(() => {
@@ -167,6 +171,60 @@ const Game2048 = () => {
 
         window.addEventListener('keydown', handleKeyPress);
         return () => window.removeEventListener('keydown', handleKeyPress);
+    }, [grid, gameStatus]);
+
+    // Handle touch events for swipe gestures
+    useEffect(() => {
+        const gridElement = gridRef.current;
+        if (!gridElement || !grid || gameStatus) return;
+        
+        const handleTouchStart = (e) => {
+            touchStartRef.current = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+        };
+        
+        const handleTouchEnd = (e) => {
+            if (!touchStartRef.current) return;
+            
+            const touchEnd = {
+                x: e.changedTouches[0].clientX,
+                y: e.changedTouches[0].clientY
+            };
+            
+            const dx = touchEnd.x - touchStartRef.current.x;
+            const dy = touchEnd.y - touchStartRef.current.y;
+            
+            // Determine swipe direction based on which axis had the larger movement
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal swipe
+                if (Math.abs(dx) > 30) { // Minimum swipe distance threshold
+                    if (dx > 0) {
+                        handleMove('right');
+                    } else {
+                        handleMove('left');
+                    }
+                }
+            } else {
+                // Vertical swipe
+                if (Math.abs(dy) > 30) { // Minimum swipe distance threshold
+                    if (dy > 0) {
+                        handleMove('down');
+                    } else {
+                        handleMove('up');
+                    }
+                }
+            }
+        };
+        
+        gridElement.addEventListener('touchstart', handleTouchStart);
+        gridElement.addEventListener('touchend', handleTouchEnd);
+        
+        return () => {
+            gridElement.removeEventListener('touchstart', handleTouchStart);
+            gridElement.removeEventListener('touchend', handleTouchEnd);
+        };
     }, [grid, gameStatus]);
 
     const handleMove = (direction) => {
@@ -237,8 +295,9 @@ const Game2048 = () => {
                 </motion.div>
 
                 <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-20">
-                    {/* Game Grid */}
+                    {/* Game Grid - Add ref for touch events */}
                     <motion.div
+                        ref={gridRef}
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         className="grid grid-cols-4 gap-3 p-4 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-lg"
@@ -324,6 +383,11 @@ const Game2048 = () => {
                             )}
                         </div>
                     </div>
+                </div>
+                
+                {/* Add swipe instructions for mobile users */}
+                <div className="mt-4 text-white/70 text-sm">
+                    <p>Swipe on the grid to move tiles</p>
                 </div>
             </div>
 

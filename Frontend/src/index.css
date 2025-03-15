@@ -74,6 +74,50 @@
   .message-section .bullet-point {
     @apply flex items-start gap-2 ml-2 mb-2;
   }
+
+  .prose h2 {
+    @apply text-xl font-semibold text-indigo-700 mt-6 mb-3;
+  }
+
+  .prose ul {
+    @apply space-y-2 my-3 list-none pl-0;
+  }
+
+  .prose li {
+    @apply flex items-start gap-2;
+  }
+
+  .prose li:before {
+    content: "•";
+    @apply text-indigo-600 mt-1;
+  }
+
+  .prose strong {
+    @apply font-bold text-indigo-600;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-indigo-300 pl-4 my-4 italic text-gray-600;
+  }
+
+  .prose code {
+    @apply bg-indigo-50 px-1.5 py-0.5 rounded text-indigo-600 text-sm;
+  }
+
+  .animate-thinking-dot {
+    animation: thinking 1s ease-in-out infinite;
+  }
+
+  @keyframes thinking {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.5;
+    }
+  }
 }
 
 /* Animation Delays */
