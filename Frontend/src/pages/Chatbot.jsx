@@ -61,7 +61,7 @@ const Chatbot = () => {
   // Fetch active session when returning from history view
   const fetchActiveSession = async () => {
     try {
-      const response = await fetch("http://localhost:5000/active-session");
+      const response = await fetch("https://healthify-bot-rag.onrender.com/active-session");
       
       if (!response.ok) {
         console.error(`Failed to fetch active session. Status: ${response.status}`);
@@ -99,7 +99,7 @@ const Chatbot = () => {
       setIsLoading(true);
       console.log("🔍 Fetching chat history...");
       
-      const response = await fetch("http://localhost:5000/history");
+      const response = await fetch("https://healthify-bot-rag.onrender.com/history");
       
       if (!response.ok) {
         throw new Error(`Failed to fetch history. Status: ${response.status}`);
@@ -210,7 +210,7 @@ const Chatbot = () => {
       const simple = isSimpleQuery(messageText);
 
       // Send request to backend
-      const response = await fetch("http://localhost:5000/chat", {
+      const response = await fetch("https://healthify-bot-rag.onrender.com/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: messageText, simple }),
@@ -294,11 +294,11 @@ const Chatbot = () => {
     if (messages.length === 0) return;
 
     try {
-      await fetch("http://localhost:5000/archive-session", {
+      await fetch("https://healthify-bot-rag.onrender.com/archive-session", {
         method: "POST",
       });
       
-      const response = await fetch("http://localhost:5000/clear-session", {
+      const response = await fetch("https://healthify-bot-rag.onrender.com/clear-session", {
         method: "POST",
       });
       
@@ -313,7 +313,7 @@ const Chatbot = () => {
 
   const clearHistory = async () => {
     try {
-      const response = await fetch("http://localhost:5000/history", {
+      const response = await fetch("https://healthify-bot-rag.onrender.com/history", {
         method: "DELETE",
       });
       
