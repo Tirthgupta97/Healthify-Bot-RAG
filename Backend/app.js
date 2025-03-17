@@ -31,7 +31,7 @@ async function loadKnowledgeBase() {
         const fullText = await extractPDFText(pdfPath);
         
         // Split the text into manageable chunks (300-500 words per chunk)
-        const chunks = splitIntoChunks(fullText, 400);
+        const chunks = splitIntoChunks(fullText, 300);
         console.log(`✅ Knowledge Base split into ${chunks.length} chunks`);
         
         // Generate embeddings for each chunk
@@ -124,11 +124,6 @@ async function getAnswerUsingRAG(query) {
             - Break down into numbered steps
             - Keep it simple and doable
 
-            ## Science Corner
-            - Share 1-2 interesting research findings
-            - Explain in simple terms
-            - Connect to everyday life
-
             End with:
             - A short, encouraging summary
             - An invitation to practice or learn more
@@ -163,7 +158,7 @@ async function getAnswerUsingRAG(query) {
                 }
             ],
             generationConfig: {
-                maxOutputTokens: isSimpleQuery ? 1024 : 4096,
+                maxOutputTokens: isSimpleQuery ? 1024 : 2048,
                 temperature: 0.7,
             }
         });

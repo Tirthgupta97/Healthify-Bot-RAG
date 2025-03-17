@@ -21,6 +21,7 @@ const GameItem = ({ name, path, img, index }) => (
             type: "spring",
             stiffness: 100
         }}
+        className="w-full"
     >
         <Link to={path} className="block">
             <motion.div
@@ -29,10 +30,10 @@ const GameItem = ({ name, path, img, index }) => (
                     boxShadow: "0 20px 30px -10px rgba(0, 0, 0, 0.2)"
                 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-white/80 backdrop-blur-sm text-gray-800 rounded-2xl p-6 h-80 flex flex-col items-center transition-all duration-300 border border-white/20"
+                className="bg-white/80 backdrop-blur-sm text-gray-800 rounded-2xl p-4 md:p-6 h-64 sm:h-72 md:h-80 flex flex-col items-center transition-all duration-300 border border-white/20"
             >
                 <motion.div
-                    className="w-full h-48 mb-4 overflow-hidden rounded-xl"
+                    className="w-full h-36 sm:h-40 md:h-48 mb-4 overflow-hidden rounded-xl"
                     whileHover={{ scale: 1.05 }}
                 >
                     <motion.img 
@@ -42,7 +43,7 @@ const GameItem = ({ name, path, img, index }) => (
                     />
                 </motion.div>
                 <motion.h3 
-                    className="text-2xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                    className="text-lg sm:text-xl md:text-2xl font-bold text-center bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
                 >
                     {name}
                 </motion.h3>
@@ -56,7 +57,7 @@ const Games = () => {
         <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 text-gray-900 py-16 px-6"
+            className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 text-gray-900 py-10 sm:py-12 md:py-16 px-4 sm:px-6"
         >
             <motion.div
                 initial={{ y: -20 }}
@@ -64,7 +65,7 @@ const Games = () => {
                 className="max-w-7xl mx-auto"
             >
                 <motion.h2 
-                    className="text-5xl font-bold text-center mb-1 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-4 leading-relaxed py-2"
+                    className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-1 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mt-4 leading-relaxed py-2"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2 }}
@@ -72,7 +73,7 @@ const Games = () => {
                     Relax & Play
                 </motion.h2>
                 <motion.p
-                    className="text-xl text-gray-600 text-center mb-12 max-w-2xl mx-auto"
+                    className="text-lg sm:text-xl text-gray-600 text-center mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto px-2"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
@@ -80,7 +81,7 @@ const Games = () => {
                     Explore our collection of mindful games designed to help you relax and destress
                 </motion.p>
                 <motion.div 
-                    className="grid grid-cols-3 gap-8 max-w-5xl mx-auto"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto"
                     variants={{
                         hidden: { opacity: 0 },
                         show: {
