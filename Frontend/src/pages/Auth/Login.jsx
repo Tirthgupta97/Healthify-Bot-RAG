@@ -38,6 +38,8 @@ const Login = () => {
     } catch (error) {
       console.error('Login error:', error);
       setError(error.message || 'Failed to login. Please check your credentials.');
+      // Maybe add an alert for debugging
+      alert('Login error: ' + error.message);
     } finally {
       setIsLoading(false);
     }
