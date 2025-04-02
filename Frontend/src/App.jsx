@@ -13,7 +13,7 @@ import Game2048 from "./pages/Game2048";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import { useState, useEffect } from "react";
-import jwtDecode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { Loader2 } from "lucide-react"; // You're already using lucide-react elsewhere
 
 const Layout = ({ children }) => {
