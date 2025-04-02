@@ -5,6 +5,9 @@ import dotenv from 'dotenv';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { extractPDFText } from './utils/processPDF.js';
 import { createEmbedding, findSimilarChunks } from './utils/embeddingUtils.js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 const __dirname = import.meta.url.replace('file://', '');
 
@@ -15,10 +18,126 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('📊 Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+// User Schema
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Session Schema - now with userId
+const sessionSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  query: String,
+  answer: String,
+  timestamp: { type: Date, default: Date.now },
+  messages: [{
+    query: String,
+    answer: String,
+    timestamp: Date
+  }],
+  duration: { type: Number, default: 0 },
+  totalMessages: { type: Number, default: 0 },
+  isActive: { type: Boolean, default: true }
+});
+
+const Session = mongoose.model('Session', sessionSchema);
+
+// Game recommendation schema
+const gameSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: String,
+  category: { type: String, required: true }, // anxiety, depression, focus, etc.
+  link: String,
+  imageUrl: String
+});
+
+const Game = mongoose.model('Game', gameSchema);
+
+// Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.status(401).json({ error: "Access denied" });
+  
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (error) {
+    res.status(400).json({ error: "Invalid token" });
+  }
+};
+
+// User registration
+app.post('/register', async (req, res) => {
+  try {
+    const { email, password, name } = req.body;
+    
+    // Check if user already exists
+    const emailExists = await User.findOne({ email });
+    if (emailExists) return res.status(400).json({ error: "Email already exists" });
+    
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Create new user
+    const user = new User({
+      email,
+      password: hashedPassword,
+      name
+    });
+    
+    const savedUser = await user.save();
+    res.status(201).json({ 
+      message: "User created successfully",
+      userId: savedUser._id
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// User login
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Check if user exists
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: "Email or password is incorrect" });
+    
+    // Validate password
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) return res.status(400).json({ error: "Email or password is incorrect" });
+    
+    // Create and assign token
+    const token = jwt.sign({ _id: user._id, name: user.name }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    
+    res.json({ 
+      token, 
+      user: { 
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 let knowledgeBase = [];
-let conversationHistory = []; // Archived conversations
-let activeSession = null; // Current active session
-let lastInteractionTimestamp = null;
 
 // Initialize Google Generative AI
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -68,25 +187,85 @@ function splitIntoChunks(text, wordsPerChunk) {
 
 loadKnowledgeBase();
 
-async function getAnswerUsingRAG(query) {
+// Enhanced classification function
+function classifyMessage(query) {
+    const simplePatterns = [
+        /^hi+\s*$/i,
+        /^hello+\s*$/i,
+        /^hey+\s*$/i,
+        /^how are you/i,
+        /^what's up/i,
+        /^good morning/i,
+        /^good afternoon/i,
+        /^good evening/i,
+        /^thanks/i,
+        /^thank you/i,
+        /^bye/i,
+        /^goodbye/i,
+        /^see you/i,
+    ];
+    
+    if (simplePatterns.some(pattern => pattern.test(query.trim()))) {
+        return true;
+    }
+    
+    if (query.split(' ').length < 5) {
+        return true;
+    }
+    
+    const questionMarkCount = (query.match(/\?/g) || []).length;
+    if (questionMarkCount > 1) {
+        return false;
+    }
+    
+    return false;
+}
+
+// Function to suggest games based on query content
+async function suggestGames(query) {
     try {
-        // 1. Generate embedding for the query
         const queryEmbedding = await createEmbedding(query);
         
-        // 2. Find the most relevant chunks using similarity search
-        const relevantChunks = await findSimilarChunks(queryEmbedding, knowledgeBase, 5); // Increased chunks from 3 to 5
+        const categories = [
+            'anxiety', 'stress', 'depression', 'focus', 
+            'meditation', 'sleep', 'mindfulness', 'exercise'
+        ];
         
-        // 3. Join the relevant chunks text to create the context
+        const relevantCategories = categories.filter(category => 
+            query.toLowerCase().includes(category)
+        );
+        
+        if (relevantCategories.length === 0) {
+            const games = await Game.aggregate([{ $sample: { size: 2 } }]);
+            return games;
+        }
+        
+        const games = await Game.find({ 
+            category: { $in: relevantCategories } 
+        }).limit(2);
+        
+        return games;
+    } catch (error) {
+        console.error("Error suggesting games:", error);
+        return [];
+    }
+}
+
+// Updated answer generation with language support
+async function getAnswerUsingRAG(query, isSimple = false, language = 'en') {
+    try {
+        const queryEmbedding = await createEmbedding(query);
+        
+        const relevantChunks = await findSimilarChunks(queryEmbedding, knowledgeBase, 5);
         const context = relevantChunks.map(chunk => chunk.text).join('\n\n');
         
-        console.log(`🔍 Found ${relevantChunks.length} relevant chunks for query`);
+        let languageInstruction = "";
+        if (language !== 'en') {
+            languageInstruction = `Respond in ${language}. `;
+        }
         
-        // Determine if this is a simple query
-        const isSimpleQuery = /^(hi|hello|hey|how are you|what's up|good morning|good afternoon|good evening|thanks|thank you|bye|goodbye|see you)/i.test(query.trim());
-
-        // Choose prompt based on query type
-        const systemPrompt = isSimpleQuery ? 
-            `You are Healthify, a friendly mental wellness buddy. Keep your response brief, warm, and engaging. Use emojis naturally.
+        const systemPrompt = isSimple ? 
+            `You are Healthify, a friendly mental wellness buddy. ${languageInstruction}Keep your response brief, warm, and engaging. Use emojis naturally.
 
             RELEVANT KNOWLEDGE:
             ${context}
@@ -99,7 +278,7 @@ async function getAnswerUsingRAG(query) {
 
             User Query: ${query}`
             :
-            `You are Healthify, a friendly and supportive mental wellness buddy! Use this knowledge to help:
+            `You are Healthify, a friendly and supportive mental wellness buddy! ${languageInstruction}Use this knowledge to help:
 
             RELEVANT KNOWLEDGE:
             ${context}
@@ -149,7 +328,6 @@ async function getAnswerUsingRAG(query) {
 
             User Query: ${query}`;
 
-        // 5. Generate the response using the LLM with the retrieved context
         const result = await model.generateContent({
             contents: [
                 {
@@ -158,26 +336,17 @@ async function getAnswerUsingRAG(query) {
                 }
             ],
             generationConfig: {
-                maxOutputTokens: isSimpleQuery ? 1024 : 2048,
+                maxOutputTokens: isSimple ? 1024 : 2048,
                 temperature: 0.7,
             }
         });
 
         let answer = result.response.text();
         
-        // Ensure consistent formatting
         answer = answer
-            .replace(/^[-*]\s/gm, '• ') // Convert all bullet points to •
-            .replace(/(\n{3,})/g, '\n\n') // Normalize multiple line breaks
-            .replace(/##\s*([^\n]+)/g, '\n\n## $1\n'); // Format headings consistently
-
-        // Add line breaks around headings if missing
-        answer = answer.split('\n').map(line => {
-            if (line.startsWith('## ')) {
-                return `\n${line}\n`;
-            }
-            return line;
-        }).join('\n');
+            .replace(/^[-*]\s/gm, '• ') 
+            .replace(/(\n{3,})/g, '\n\n') 
+            .replace(/##\s*([^\n]+)/g, '\n\n## $1\n'); 
 
         return answer;
     } catch (error) {
@@ -186,86 +355,72 @@ async function getAnswerUsingRAG(query) {
     }
 }
 
-// Creates a new session or updates the existing one
-function manageSession(query, answer) {
-    const currentTime = new Date();
-    const message = { query, answer, timestamp: currentTime };
-    
-    // If no active session or session expired (30 minutes), create a new one
-    if (!activeSession || !lastInteractionTimestamp || 
-        (currentTime - new Date(lastInteractionTimestamp)) > 30 * 60 * 1000) {
-        
-        activeSession = {
-            id: Date.now(),
-            query,
-            answer,
-            timestamp: currentTime,
-            messages: [message],
-            duration: 0,
-            totalMessages: 1,
-            isActive: true
-        };
-        
-        console.log("🆕 New Session Created:", activeSession.id);
-    } else {
-        // Update existing session
-        activeSession.query = query; // Last query becomes the session title
-        activeSession.answer = answer;
-        activeSession.timestamp = currentTime; // Update timestamp
-        activeSession.messages.push(message);
-        activeSession.totalMessages = activeSession.messages.length;
-        
-        // Calculate session duration
-        const firstMessageTime = new Date(activeSession.messages[0].timestamp);
-        activeSession.duration = Math.round((currentTime - firstMessageTime) / 1000 / 60);
-        
-        console.log("➕ Message Added to Session:", activeSession.id);
-    }
-    
-    lastInteractionTimestamp = currentTime;
-    return activeSession;
-}
-
-app.post("/chat", async (req, res) => {
+// Update existing chat endpoint to use authentication
+app.post("/chat", authenticateToken, async (req, res) => {
     const query = req.body.query;
+    const userId = req.user._id;
+    const language = req.body.language || 'en';
+    
     if (!query) return res.json({ reply: "I didn't understand that." });
 
-    console.log("👤 User:", query);
+    console.log(`👤 User (${userId}):`, query);
+    console.log(`🌐 Language: ${language}`);
 
-    const answer = await getAnswerUsingRAG(query);
-    manageSession(query, answer);
+    const isSimple = classifyMessage(query);
+    
+    const answer = await getAnswerUsingRAG(query, isSimple, language);
+    const gameRecommendations = await suggestGames(query);
+    
+    let session = await Session.findOne({ userId, isActive: true });
+    
+    const message = { query, answer, timestamp: new Date() };
+    
+    if (!session) {
+        session = new Session({
+            userId,
+            query,
+            answer,
+            timestamp: new Date(),
+            messages: [message],
+            totalMessages: 1,
+            isActive: true
+        });
+    } else {
+        session.query = query;
+        session.answer = answer;
+        session.timestamp = new Date();
+        session.messages.push(message);
+        session.totalMessages = session.messages.length;
+        
+        const firstMessageTime = new Date(session.messages[0].timestamp);
+        session.duration = Math.round((new Date() - firstMessageTime) / 1000 / 60);
+    }
+    
+    await session.save();
+    console.log(`✅ Session ${session.isActive ? 'updated' : 'created'} for user ${userId}`);
     
     console.log("🤖 Bot:", answer);
     
     res.json({ 
         reply: answer,
-        sessionId: activeSession.id
+        sessionId: session._id,
+        gameRecommendations
     });
 });
 
-// Get current active session
-app.get("/active-session", (req, res) => {
-    res.json(activeSession || { messages: [] });
-});
-
-// Get all archived sessions (history)
-app.get("/history", (req, res) => {
+// Update history endpoint to be user-specific
+app.get("/history", authenticateToken, async (req, res) => {
     try {
-        console.log("🌐 Received request for chat history");
+        const userId = req.user._id;
+        console.log(`🌐 Getting chat history for user ${userId}`);
         
-        // Map history to ensure consistent format
-        const sanitizedHistory = conversationHistory.map(session => ({
-            id: session.id || Date.now(),
-            query: session.query || "Unnamed Session",
-            answer: session.answer || "No response",
-            timestamp: session.timestamp || new Date(),
-            messages: session.messages || [],
-            duration: session.duration || 0,
-            totalMessages: session.totalMessages || session.messages.length
-        }));
-
-        console.log(`📦 Sending ${sanitizedHistory.length} archived sessions`);
-        res.json(sanitizedHistory);
+        const sessions = await Session.find({ 
+            userId,
+            isActive: false 
+        }).sort({ timestamp: -1 });
+        
+        console.log(`📦 Sending ${sessions.length} archived sessions`);
+        res.json(sessions);
     } catch (error) {
         console.error("❌ Error in /history endpoint:", error);
         res.status(500).json({ 
@@ -275,58 +430,64 @@ app.get("/history", (req, res) => {
     }
 });
 
-// Clear all history and active session
-app.delete("/history", (req, res) => {
-    conversationHistory = [];
-    activeSession = null;
-    lastInteractionTimestamp = null;
-    console.log("🧹 All chat history and active session cleared");
-    res.json({ success: true, message: "All chat history cleared" });
-});
-
-// Archive current session and start a new one
-app.post("/archive-session", (req, res) => {
-    if (activeSession) {
-        // Make a deep copy to avoid reference issues
-        const sessionToArchive = JSON.parse(JSON.stringify(activeSession));
-        sessionToArchive.isActive = false;
-        conversationHistory.push(sessionToArchive);
-        console.log("📂 Session archived:", activeSession.id);
+// Update active session endpoint
+app.get("/active-session", authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const session = await Session.findOne({ userId, isActive: true });
+        res.json(session || { messages: [] });
+    } catch (error) {
+        console.error("Error fetching active session:", error);
+        res.status(500).json({ error: "Failed to retrieve active session" });
     }
-    
-    // Clear active session
-    activeSession = null;
-    lastInteractionTimestamp = null;
-    
-    res.json({ 
-        success: true, 
-        message: "Session archived" 
-    });
 });
 
-// Clear active session without archiving
-app.post("/clear-session", (req, res) => {
-    activeSession = null;
-    lastInteractionTimestamp = null;
-    
-    res.json({ 
-        success: true, 
-        message: "Active session cleared" 
-    });
+// Update session archiving
+app.post("/archive-session", authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const session = await Session.findOne({ userId, isActive: true });
+        
+        if (session) {
+            session.isActive = false;
+            await session.save();
+            console.log(`📂 Session archived for user ${userId}:`, session._id);
+        }
+        
+        res.json({ success: true, message: "Session archived" });
+    } catch (error) {
+        console.error("Error archiving session:", error);
+        res.status(500).json({ error: "Failed to archive session" });
+    }
 });
 
-// Delete a specific session from history by ID
-app.delete("/history/:sessionId", (req, res) => {
-    const sessionId = parseInt(req.params.sessionId);
-    
-    const initialLength = conversationHistory.length;
-    conversationHistory = conversationHistory.filter(session => session.id !== sessionId);
-    
-    if (conversationHistory.length < initialLength) {
-        console.log(`🗑️ Deleted session ${sessionId} from history`);
-        res.json({ success: true, message: `Session ${sessionId} deleted` });
-    } else {
-        res.status(404).json({ success: false, message: "Session not found" });
+// Update clear session endpoint
+app.post("/clear-session", authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user._id;
+        await Session.deleteOne({ userId, isActive: true });
+        
+        res.json({ success: true, message: "Active session cleared" });
+    } catch (error) {
+        console.error("Error clearing session:", error);
+        res.status(500).json({ error: "Failed to clear session" });
+    }
+});
+
+// Games API endpoints
+app.get('/games', authenticateToken, async (req, res) => {
+    try {
+        const { category } = req.query;
+        let query = {};
+        
+        if (category) {
+            query.category = category;
+        }
+        
+        const games = await Game.find(query);
+        res.json(games);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
