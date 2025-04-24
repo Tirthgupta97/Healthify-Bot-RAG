@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
-import { Heart } from "lucide-react";
+import { Heart, ArrowUp } from "lucide-react";
 
 const Footer = () => {
   const containerVariants = {
@@ -23,85 +23,144 @@ const Footer = () => {
     { name: "Games", path: "/games" }
   ];
 
+  const resourceLinks = [
+    { name: "Health Articles", path: "/articles" },
+    { name: "Wellness Tips", path: "/tips" },
+    { name: "FAQ", path: "/faq" }
+  ];
+
+  const legalLinks = [
+    { name: "Privacy Policy", path: "/privacy" },
+    { name: "Terms of Service", path: "/terms" },
+    { name: "Cookies", path: "/cookies" }
+  ];
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
   return (
     <motion.footer
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
       variants={containerVariants}
-      className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white py-6 px-4 md:py-8 md:px-8 relative overflow-hidden"
+      className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white py-6 px-4 md:py-8 md:px-6 relative overflow-hidden"
     >
       <div className="absolute inset-0 bg-[url('data:image/svg+xml,...')] opacity-10"></div>
 
-      <motion.div
-        className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left relative z-10 gap-6 md:gap-12"
-        variants={containerVariants}
+      {/* Back to top button */}
+      <motion.div 
+        className="absolute right-3 md:right-6 top-3 z-20"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
       >
-        {/* Brand Info */}
-        <motion.div className="mb-4 md:mb-0" variants={itemVariants}>
-          <motion.h2
-            className="text-3xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight leading-tight py-1"
-            whileHover={{ scale: 1.05 }}
-          >
-            Healthify
-          </motion.h2>
-          <motion.p
-            className="text-sm md:text-xl text-white/90 mt-1 font-medium tracking-wide flex justify-center md:justify-start items-center"
-            variants={itemVariants}
-          >
-            Your AI-powered wellness companion
-            <motion.span
-              initial={{ scale: 1 }}
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="inline-block ml-1 md:ml-2"
-            >
-              <Heart className="fill-blue-700" />
-            </motion.span>
-          </motion.p>
-        </motion.div>
-
-        {/* Navigation Links */}
-        <motion.div
-          className="flex flex-col md:flex-row justify-center md:justify-start gap-4 md:gap-12 text-sm md:text-lg"
-          variants={itemVariants}
+        <motion.button
+          onClick={scrollToTop}
+          whileHover={{ scale: 1.1, backgroundColor: "#4F46E5" }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-white/10 backdrop-blur-sm p-1.5 rounded-full border border-white/20 text-white"
+          aria-label="Back to top"
         >
-          {navLinks.map((link, index) => (
-            <motion.div
-              key={link.name}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative group"
-            >
-              <NavLink
-                to={link.path}
-                className={({ isActive }) =>
-                  `relative px-2 py-1 md:px-4 md:py-2 font-medium transition-all duration-300 ${
-                    isActive ? "text-blue-300" : "text-white hover:text-blue-200"
-                  }`
-                }
-              >
-                {link.name}
-                <motion.div
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full transform origin-left"
-                  initial={{ scaleX: 0 }}
-                  whileHover={{ scaleX: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </NavLink>
-            </motion.div>
-          ))}
-        </motion.div>
+          <ArrowUp size={18} />
+        </motion.button>
       </motion.div>
 
-      {/* Bottom Section */}
       <motion.div
-        className="text-center text-xs md:text-sm text-white/60 mt-6 md:mt-8 pt-4 md:pt-8 border-t border-white/10"
-        variants={itemVariants}
+        className="max-w-6xl mx-auto relative z-10"
+        variants={containerVariants}
       >
-        <motion.p whileHover={{ color: "#fff" }} transition={{ duration: 0.3 }}>
-          © {new Date().getFullYear()} Healthify. All Rights Reserved.
-        </motion.p>
+        {/* Main Footer Content */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-4">
+          {/* Brand Section */}
+          <motion.div variants={itemVariants} className="mb-2 md:mb-0">
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent tracking-tight leading-tight"
+              whileHover={{ scale: 1.05 }}
+            >
+              Healthify
+            </motion.h2>
+            <motion.p
+              className="text-sm md:text-base text-white/90 font-medium tracking-wide flex items-center"
+              variants={itemVariants}
+            >
+              Your AI-powered wellness companion
+              <motion.span
+                initial={{ scale: 1 }}
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="inline-block ml-2"
+              >
+                <Heart size={16} className="fill-blue-700" />
+              </motion.span>
+            </motion.p>
+          </motion.div>
+
+          {/* Navigation Links */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-base md:text-lg font-semibold mb-2 text-blue-300">Navigation</h3>
+            <ul className="space-y-1.5">
+              {navLinks.map((link) => (
+                <motion.li key={link.name} whileHover={{ x: 3 }}>
+                  <NavLink
+                    to={link.path}
+                    className={({ isActive }) =>
+                      `text-sm md:text-base hover:text-blue-300 transition-colors ${
+                        isActive ? "text-blue-300" : "text-white/80"
+                      }`
+                    }
+                  >
+                    {link.name}
+                  </NavLink>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Resources */}
+          <motion.div variants={itemVariants}>
+            <h3 className="text-base md:text-lg font-semibold mb-2 text-blue-300">Resources</h3>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+              {resourceLinks.map((link) => (
+                <motion.li key={link.name} whileHover={{ x: 3 }}>
+                  <NavLink
+                    to={link.path}
+                    className="text-sm md:text-base text-white/80 hover:text-blue-300 transition-colors"
+                  >
+                    {link.name}
+                  </NavLink>
+                </motion.li>
+              ))}
+              {legalLinks.map((link) => (
+                <motion.li key={link.name} whileHover={{ x: 3 }}>
+                  <NavLink
+                    to={link.path}
+                    className="text-sm md:text-base text-white/80 hover:text-blue-300 transition-colors"
+                  >
+                    {link.name}
+                  </NavLink>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
+
+        {/* Bottom Section */}
+        <motion.div
+          className="text-center text-sm md:text-base text-white/60 border-t border-white/10 pt-3 mt-3"
+          variants={itemVariants}
+        >
+          <motion.p whileHover={{ color: "#fff" }} transition={{ duration: 0.3 }}>
+            © {new Date().getFullYear()} Healthify. All Rights Reserved.
+          </motion.p>
+          <p className="mt-1 text-xs md:text-sm text-white/40">
+            Healthify is committed to providing reliable health information but is not a substitute for professional medical advice.
+          </p>
+        </motion.div>
       </motion.div>
     </motion.footer>
   );
