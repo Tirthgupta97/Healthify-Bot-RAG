@@ -10,6 +10,10 @@ import SoothingSoundboard from "./pages/SoothingSoundboard";
 import CalmColoring from "./pages/CalmColoring";
 import HangmanGame from "./pages/HangmanGame";
 import Game2048 from "./pages/Game2048";
+import IntelligentAI from './pages/features/IntelligentAI';
+import StressFreeActivities from './pages/features/StressFreeActivities';
+import GlobalSupport from './pages/features/GlobalSupport';
+import MoodTracking from './pages/features/MoodTracking';
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -38,6 +42,10 @@ const App = () => {
           <Route path="/Calm-Coloring" element={<CalmColoring />} />
           <Route path="/Hang-Man" element={<HangmanGame />} />
           <Route path="/2048" element={<Game2048 />} />
+          <Route path="/features/intelligent-ai" element={<IntelligentAI />} />
+          <Route path="/features/stress-free-activities" element={<StressFreeActivities />} />
+          <Route path="/features/global-support" element={<GlobalSupport />} />
+          <Route path="/features/mood-tracking" element={<MoodTracking />} />
         </Routes>
       </Layout>
     </Router>
